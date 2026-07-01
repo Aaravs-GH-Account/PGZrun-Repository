@@ -26,7 +26,7 @@ answer_box4.move_ip(370,450)
 score=0
 time_left=10
 is_game_over=False
-question_file_name='question.txt'
+question_file_name=r'c:\Users\kidsLogin\Desktop\Quiz Game\questions.txt'
 marquee_message=''
 
 answer_boxes=[answer_box1,answer_box2,answer_box3,answer_box4]
@@ -52,13 +52,58 @@ def draw():
     screen.draw.textbox(str(time_left),timer_box,color='white')
     screen.draw.textbox('Skip',skip_box,color='white')
     screen.draw.textbox(question[0].strip(),question_box, color='black')
+    index=1
+    for answer_box in answer_boxes:
+        screen.draw.textbox(question[index].strip(),answer_box, color='black')
+        index=index+1
 
+def move_marquee():
+    marquee_box.x = marquee_box.x-2
+    if marquee_box.right<0:
+        marquee_box.left=WIDTH
 
+def read_question_file():
+    global question_count, questions
+    q_file=open(question_file_name,'r')
+    for question in q_file:
+        questions.append(question)
+        question_count=question_count+1
+    q_file.close()
 
-
-
+def read_next_question():
+    global question_index
+    question_index=question_index+1
+    return questions.pop(0).split('|')
 
 def update():
-    pass
-question=['Question:','ans1','ans2','ans3','ans4','1']
+    move_marquee()
+
+def on_mouse_down(pos):
+    index=1
+    for box in answer_boxes:
+        if box.colliepoint(pos):
+            if index is int(question[5]):
+                correct_answer()
+            else:
+                game_over()
+        index=index+1
+    if skip_box.collidepoint(pos):
+        skip_question()
+
+def correct_answer():
+    global score, question, questions, time_left
+    score=score+1
+    if questions:
+        question=read_next_question()
+        time_left=10
+    else:
+        game_over()
+
+
+
+
+
+#question=['Question:','ans1','ans2','ans3','ans4','1']
+read_question_file()
+question=read_next_question()
 pgzrun.go()
